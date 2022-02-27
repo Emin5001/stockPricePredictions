@@ -3,9 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import *
+from sklearn.preprocessing import MinMaxScaler
 
 window = Tk()
-
+window.title('STOCK PREDICTION GRAPHS')
 apple_stock_data = pd.read_csv('/Users/eminn/PycharmProjects/stockPricePredictions/data/APPL.csv')
 
 """
@@ -17,7 +18,7 @@ such as Date, Open Price, and Close Price.
 apple_stock_data = apple_stock_data[['Date', 'Open', 'Close']]
 apple_stock_data['Date'] = pd.to_datetime(apple_stock_data['Date'].apply(lambda x : x.split()[0]))
 apple_stock_data.set_index('Date', drop=True, inplace=True)
-print(apple_stock_data.head())
+# print(apple_stock_data.head())
 
 """
 method to print the real-data opening
@@ -52,8 +53,35 @@ def printInitialCloseStockPrices():
     ax[1].legend()
     window.mainloop()
 
+# printInitialOpenStockPrices()
+# printInitialCloseStockPrices()
+
+MMS = MinMaxScaler()
+apple_stock_data[apple_stock_data.columns] = MMS.fit_transform(apple_stock_data)
+print(apple_stock_data.shape)
+
+training_size = round(len(apple_stock_data) * 0.80) #Selecting 80% of the data for training and leaving the remaining for testing
+train_data = apple_stock_data[:training_size] #The specific data to use to train the model
+test_data = apple_stock_data[training_size:]  #the specific data to use to test the model
+
+"""
+Function to create sequences of data to use
+for training and testing.
+"""
 
 
+def create_sequence(dataset):
+    sequences = []
+    labels = []
+    start_index = 0
 
-printInitialOpenStockPrices()
-printInitialCloseStockPrices()
+    for stop_index in range(25, len(dataset)): #selecting 25 rows at a time
+        sequences.append(dataset.iloc[start_index:stop_index])
+        labels.append(dataset.iloc[stop_index])
+        start_index += 1
+    return (np.array(sequences), np.array(labels))
+
+train_sequence, train_label = create_sequence(train_data)
+test_sequence, test_label = create_sequence(test_data)
+
+print(train_sequence.shape, train_label.shape, test_sequence.shape, test_label.shape)
