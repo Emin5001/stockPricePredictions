@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import *
 from sklearn.preprocessing import MinMaxScaler
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, LSTM, Bidirectional
 
 window = Tk()
 window.title('STOCK PREDICTION GRAPHS')
@@ -85,3 +87,9 @@ train_sequence, train_label = create_sequence(train_data)
 test_sequence, test_label = create_sequence(test_data)
 
 print(train_sequence.shape, train_label.shape, test_sequence.shape, test_label.shape)
+
+
+"""
+CREATING LSTM MODEL
+"""
+model = Sequential()
